@@ -12,7 +12,7 @@ final class ContentObservable {
         throw new AssertionError("No instances");
     }
 
-    public static Observable<Intent> fromBroadcast(Context context, IntentFilter filter) {
+    static Observable<Intent> fromBroadcast(Context context, IntentFilter filter) {
         return Observable.create(new OnSubscribeBroadcastRegister(context, filter, null, null));
     }
 }

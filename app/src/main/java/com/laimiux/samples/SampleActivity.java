@@ -8,10 +8,7 @@ import com.laimiux.rxnetwork.RxNetwork;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
 
 public class SampleActivity extends Activity {
     Button sendButton;
@@ -27,25 +24,20 @@ public class SampleActivity extends Activity {
         sendButton = findViewById(R.id.send_button);
 
         final Observable<ButtonState> sendStateStream =
-                RxNetwork.stream(this).map(new Function<Boolean, ButtonState>() {
-                    @Override
-                    public ButtonState apply(@NonNull Boolean hasInternet) throws Exception {
-                        if (!hasInternet) {
-                            return new ButtonState(R.string.not_connected, false);
-                        }
-                        return new ButtonState(R.string.send, true);
-                    }
-                });
+            RxNetwork.stream(this).map(this::map);
 
         sendStateSubscription =
-                sendStateStream.observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new Consumer<ButtonState>() {
-                            @Override
-                            public void accept(ButtonState buttonState) throws Exception {
-                                sendButton.setText(buttonState.textId);
-                                sendButton.setEnabled(buttonState.isEnabled);
-                            }
-                        });
+            sendStateStream.observeOn(AndroidSchedulers.mainThread())
+                .subscribe(this::onSignalReceived);
+    }
+
+    private ButtonState map(boolean hasInternet) {
+        return !hasInternet ? new ButtonState(R.string.not_connected, false) : new ButtonState(R.string.send, true);
+    }
+
+    private void onSignalReceived(ButtonState buttonState) {
+        sendButton.setText(buttonState.textId);
+        sendButton.setEnabled(buttonState.isEnabled);
     }
 
 
@@ -60,7 +52,7 @@ public class SampleActivity extends Activity {
         final int textId;
         final boolean isEnabled;
 
-        public ButtonState(int textId, boolean isEnabled) {
+        ButtonState(int textId, boolean isEnabled) {
             this.textId = textId;
             this.isEnabled = isEnabled;
         }

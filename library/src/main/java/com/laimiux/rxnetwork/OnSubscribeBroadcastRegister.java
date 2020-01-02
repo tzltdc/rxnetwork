@@ -19,7 +19,7 @@ class OnSubscribeBroadcastRegister implements ObservableOnSubscribe<Intent> {
     private final String broadcastPermission;
     private final Handler schedulerHandler;
 
-    public OnSubscribeBroadcastRegister(Context context, IntentFilter intentFilter, String broadcastPermission, Handler schedulerHandler) {
+    OnSubscribeBroadcastRegister(Context context, IntentFilter intentFilter, String broadcastPermission, Handler schedulerHandler) {
         this.context = context;
         this.intentFilter = intentFilter;
         this.broadcastPermission = broadcastPermission;
@@ -28,7 +28,7 @@ class OnSubscribeBroadcastRegister implements ObservableOnSubscribe<Intent> {
 
 
     @Override
-    public void subscribe(final @NonNull ObservableEmitter<Intent> observableEmitter) throws Exception {
+    public void subscribe(final @NonNull ObservableEmitter<Intent> observableEmitter) {
         final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
