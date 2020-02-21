@@ -18,19 +18,6 @@ public class RxNetwork {
         return cm != null ? cm.getActiveNetworkInfo() : null;
     }
 
-    private static boolean getConnectivityStatus(Context context) {
-        NetworkInfo networkInfo = getNetworkInfo(context);
-        return null != networkInfo && networkInfo.isConnected();
-    }
-
-    public static Observable<Boolean> stream(Context context) {
-        final Context applicationContext = context.getApplicationContext();
-        final IntentFilter action = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
-        return ContentObservable.fromBroadcast(context, action)
-            .map(intent -> getConnectivityStatus(applicationContext)).distinctUntilChanged()
-            .startWith(getConnectivityStatus(applicationContext));
-    }
-
     private static Status getNetworkType(Context context) {
         NetworkInfo networkInfo = getNetworkInfo(context);
         if (networkInfo != null && networkInfo.isConnected()) {
@@ -44,6 +31,15 @@ public class RxNetwork {
             return Status.ABSENT;
         }
     }
+
+  public static Observable<Boolean> stream(Context context) {
+    final Context applicationContext = context.getApplicationContext();
+    final IntentFilter action = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+    return ContentObservable.fromBroadcast(context, action)
+        .map(intent -> getNetworkType(applicationContext))
+        .distinctUntilChanged()
+        .map(status -> status != Status.ABSENT);
+  }
 
     public static Observable<Status> streamDetail(Context context) {
         final Context applicationContext = context.getApplicationContext();
