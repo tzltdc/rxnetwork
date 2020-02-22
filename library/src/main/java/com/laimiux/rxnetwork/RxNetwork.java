@@ -33,11 +33,7 @@ public class RxNetwork {
     }
 
   public static Observable<Boolean> stream(Context context) {
-    final Context applicationContext = context.getApplicationContext();
-    final IntentFilter action = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
-    return ContentObservable.fromBroadcast(context, action)
-        .map(intent -> getNetworkType(applicationContext))
-        .distinctUntilChanged()
+    return streamDetail(context)
         .map(status -> status != Status.ABSENT);
   }
 
