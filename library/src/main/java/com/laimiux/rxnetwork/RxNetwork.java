@@ -13,19 +13,36 @@ public class RxNetwork {
     private RxNetwork() {
     }
 
-
-    private static boolean getConnectivityStatus(Context context) {
+    private static NetworkInfo getNetworkInfo(Context context){
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = cm != null ? cm.getActiveNetworkInfo() : null;
-        return null != activeNetwork && activeNetwork.isConnected();
-
+        return cm != null ? cm.getActiveNetworkInfo() : null;
     }
 
-    public static Observable<Boolean> stream(Context context) {
+    private static Status getNetworkType(Context context) {
+        NetworkInfo networkInfo = getNetworkInfo(context);
+        if (networkInfo != null && networkInfo.isConnected()) {
+            String type = networkInfo.getTypeName();
+            if (type.equalsIgnoreCase("MOBILE")) {
+                return Status.MOBILE;
+            } else {
+                return Status.WIFI;
+            }
+        } else {
+            return Status.ABSENT;
+        }
+    }
+
+  public static Observable<Boolean> stream(Context context) {
+    return streamDetail(context)
+        .map(status -> status != Status.ABSENT);
+  }
+
+    public static Observable<Status> streamDetail(Context context) {
         final Context applicationContext = context.getApplicationContext();
         final IntentFilter action = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
         return ContentObservable.fromBroadcast(context, action)
-            .map(intent -> getConnectivityStatus(applicationContext)).distinctUntilChanged()
-            .startWith(getConnectivityStatus(applicationContext));
+            .map(intent -> getNetworkType(applicationContext))
+            .distinctUntilChanged()
+            .startWith(getNetworkType(applicationContext));
     }
 }

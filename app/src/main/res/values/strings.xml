@@ -2,4 +2,7 @@
     <string name="app_name">NetworkStateStream</string>
     <string name="not_connected">Not Connected</string>
     <string name="send">Send</string>
+    <string name="mobile">mobile</string>
+    <string name="wifi">wifi</string>
+    <string name="absent">absent</string>
 </resources>
